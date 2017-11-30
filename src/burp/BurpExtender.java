@@ -12,7 +12,7 @@ public class BurpExtender implements IBurpExtender {
     @Override
     public void registerExtenderCallbacks(final IBurpExtenderCallbacks callbacks) {
         //Name of the extension
-        callbacks.setExtensionName ("Burp64");
+        callbacks.setExtensionName ("Burp64v0.2");
         
         //Grabbing the helper functions
         helpers = callbacks.getHelpers();
