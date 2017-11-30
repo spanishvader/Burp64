@@ -20,6 +20,7 @@ public class BurpExtender implements IBurpExtender {
         // register ourselves as an Intruder payload processor
         callbacks.registerIntruderPayloadProcessor(new Burp64Processor("Url_Safe Base64 Encoder",true));
         callbacks.registerIntruderPayloadProcessor(new Burp64Processor("Url_Safe Base64 Decoder",false));
+        callbacks.registerIntruderPayloadProcessor(new Burp64Processor("Url_Safe Base64 Encoder (without padding)",true, false));
         
         
     }
@@ -30,12 +31,27 @@ public class BurpExtender implements IBurpExtender {
     
     public String name;
     public boolean encode;
+    public boolean padding;
     
     Burp64Processor(String name, boolean encode){
         this.name = name;
         this.encode = encode;
+        //padding enabled by default
+        this.padding = true;
     }
     
+    //different constructor to change padding
+    Burp64Processor(String name, boolean encode, boolean padding){
+        this.name = name;
+        this.encode = encode;
+        //padding enabled by default
+        this.padding = padding;
+    }
+    
+    //Function to disable padding
+    public void noPadding(){
+        this.padding = false;
+    }
 
     public String getProcessorName() {
         return this.name;
@@ -47,7 +63,11 @@ public class BurpExtender implements IBurpExtender {
         byte[] output;
 
         if(encode){
-            output = Base64.getUrlEncoder().encode(currentPayload);
+            if(padding){
+                output = Base64.getUrlEncoder().encode(currentPayload);
+            }else{
+                output = Base64.getUrlEncoder().withoutPadding().encode(currentPayload);
+            }
         }else{
             String input = helpers.bytesToString(helpers.urlDecode(currentPayload));
             try{
